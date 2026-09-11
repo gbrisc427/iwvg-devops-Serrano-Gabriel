@@ -20,10 +20,15 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
    # Copia el archivo *jar generado en el contenedor de construcción
 COPY --from=build /app/target/*.jar app.jar
+   # Punto de montaje para persistir la BD H2 fuera del contenedor
+VOLUME /app/data
+   # Activa el perfil de producción
+ENV SPRING_PROFILES_ACTIVE=prod
    # Este contenedor escucha el puerto indicado
 EXPOSE 8080
    # Define un comando para cuando se inicialice el contenedor en el host: java -jar app.jar
 CMD ["java", "-jar", "app.jar"]
+
 
 
 # ------------------------------------- COMANDOS ----------------------------------------------------------
