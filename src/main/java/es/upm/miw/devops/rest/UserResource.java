@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(UserResource.USERS)
 public class UserResource {
 
-    static final String USERS = "/user";
-    static final String ID = "/{id}";
+    public static final String USERS = "/user";
+    public static final String ID = "/{id}";
+
 
     private final UserService userService;
 
