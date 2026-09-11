@@ -14,6 +14,9 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=es.upm.miw%3Aiwvg-devops&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=es.upm.miw%3Aiwvg-devops)
 [![Render broken](https://iwvg-devops-latest.onrender.com/version-badge)](https://iwvg-devops-latest.onrender.com/swagger-ui.html)
 
+### Badges
+[![GitHub Actions]()](https://github.com/gbrisc427/iwvg-devops-Serrano-Gabriel/actions)
+[![SonarCloud]()](https://sonarcloud.io/project/overview?id=gbrisc_iwvg-devops-Serrano-Gabriel)
 
 ### Tecnologías necesarias
 `Java` `Maven` `GitHub` `GitHub Actions` `Sonarcloud` `Slack` `Spring-Boot` `GitHub Packages` `Docker` `OpenAPI`
@@ -24,7 +27,7 @@
 cd <folder path>
 git clone https://github.com/miw-upm/iwvg-devops
 ```
-2. Importar el proyecto mediante **IntelliJ IDEA**  
+2. Importar el proyecto mediante **IntelliJ IDEA**
    * **Open**, y seleccionar la carpeta del proyecto.
 
 ### :gear: Ejecución en local con IntelliJ
@@ -53,77 +56,66 @@ docker compose up --build -d
 * Cliente Web: `http://localhost:8080`
 
 ### :book: Diapositivas
-* [Diapositivas de DevOps](docs/miw-iwvg-devops-slides.pdf)   
+* [Diapositivas de DevOps](docs/miw-iwvg-devops-slides.pdf)
 
-### :dvd: [Plantilla de la práctica en _docs/template-webflux.zip_](docs/template-webflux-3.4.zip)
+### :dvd: [Plantilla de la práctica en _docs/iwvg-devops-template.zip_](docs/iwvg-devops-template.zip)
 
 ### :page_with_curl: IWVG. Devops. Enunciado de la práctica
 > Todo el software deberá estar en ingles.
 
 #### 1. Crear un proyecto (**0.5 pto**)
-Crear un proyecto Maven llamado: **iwvg-devops-apellido-nombre**, versión **4.0.0**. Para ello se aporta **zip** de la
-plantilla.
-> Recordar editar el pom y cambiar el nombre del artefacto (artifactId).   
+Crear un proyecto Maven llamado: **iwvg-devops-apellido-nombre**, versión **6.0.0**. Para ello se aporta **zip** de la
+plantilla en la plataforma de Moodle.
+> Descomprimir la carpeta.
 > Recordar cambiar el nombre de la  carpeta.   
+> Recordar editar el pom y cambiar el nombre del artefacto (artifactId).
 > Importarlo desde IntelliJ.   
-> Crear un repositorio en GitHub con el mensaje del primer comit: "Initial. Nombre Apellido"   
- 
-#### 2. Preparar la gestión mediante Scrum (**0.5 pto**)
-> Crear un proyecto de gestión en GitHub y prepararlo para la metodología de Scrum (columnas, etiquetas, hitos...).   
+> Crear un repositorio en GitHub con el mensaje del primer comit: "Initial. Nombre Apellido"
 
-#### 3. Sprint 1. Preparación del ecosistema (**1.5 ptos**)
-Se crearán las siguientes 2 historias (**Issues**) pero se trabajarán en las ramas **develop** & **master**.
+#### 2. Preparar la gestión mediante Scrum (**0.5 pto**)
+> Crear un proyecto de gestión en GitHub y prepararlo para la metodología de Scrum (columnas, etiquetas, hitos...).
+> Recordar hacerlo `public` para que se pueda visualizar.
+
+#### 3. Preparación del ecosistema (**2.5 ptos**)
+Se crearán las siguientes 3 historias (**Technical**) pero se trabajarán solo con la ramas **develop** y **staging**.
 
 * :one: Integración continua con **GitHub Actions**. Incluir **Badge** en README con **link**.
 * :two: Análisis del código con **Sonarcloud**. Incluir **Badge** en README con **link** a la cuenta de Sonar.
-> :one:, :two:... representa el orden temporal de desarrollo de los issues.
+* :three: Deploy con **AWS**. Incluir **Badge** en README con **link**.
+> :one:, :two:, :three: representa el orden temporal de desarrollo de los issues.
 
 #### 4. Release (**0.5 pto**)
-> Realizar la primera liberación del código (_**v.4.0.0-release**_)
+> Realizar la primera liberación del código, en **staging** y **main** (_**6.0.0-RC1**_ y _**6.0.0**_)
 
-#### 5. Sprint 2. Preparación del software a desarrollar (**2 ptos**)
-Se crearán las siguientes 4 historias (**Issues**).
-* Clases :one:**Fraction** & :five:**FractionTest**.
-* Clases :two:**User** & :three:**UserTest**.
-* Clases :four:**UsersDatabase**.
-* Ampliación :six:**Fraction** & :seven:**FractionTest** con las funcionalidades: **isProper, isImproper, isEquivalent, add, multiply & divide**.
+#### 5. Preparación del software a desarrollar (**2 ptos**) y siguiente liberación.
+Se crearán las siguientes 4 historias (**Feature**).
+* Feature 1ª: :one: añadir el endpoint: **GET /user/{id}**, sin tests. :five: Crear tests del servicio y del endpoint. Los tests deben realizarse sabiendo que hay un seeder.
+* Feature 2ª: :two: mejorar el filtro de busqueda añadiendo una tercera condición: **billable**, significa que el usuario es facturable,
+  eso ocurre cuando sus campos firstName, familyName, email, identity, address, city, province, postalCode tienen contenido real. :eight: añadir los tests de servicio y endpoint.
+* Feature 3ª: :three: añadir el endpoint: **DELETE /user/{id}**, sin tests. :four: añadir los tests de servicio y endpoint.
+* Feature 4ª: :six: añadir el endpoint: **PUT /user/{id}/active**, sin tests. :seven: añadir los tests de servicio y endpoint.
+> :one:, :two:... representa el orden temporal de desarrollo de los features. Cuando un feature se termine se debe incorporar a la rama **develop**. Cuando un feature se inicie, siempre empieza de donde este develop.
+> Se debe vigilar la calidad del código, y se cumpla adecuadamente, la IA aunque su código funcione, tenemos que asegurarnos que se cumple las responsabilidades de cada clase y que haga exactamente lo que le pedimos.
 
-> :one:, :two:... representa el orden temporal de desarrollo de los issues. Cuando un issue se termine se debe incorporar a la rama **develop**. Las clases User, Fraction y UsersDatabase se podrán copiar de las dadas en clase.
+> Realizar la segunda liberación del código en **staging** y **main**.
 
-> Realizar la segunda liberación del código (_**v.4.1.0-release**_)
+#### 6. Preparación del software a desarrollar (**2 ptos**) y siguiente liberación.
+Se crearán las siguientes 2 historias (**Feature**).
+* Feature 1ª: :one: añadir el endpoint: **PUT /user/{id}**, sin tests. :three: Crear tests del servicio y del endpoint.
+* Feature 2ª: :two: añadir el endpoint: **PATH /user body:[{id,active}]**, actualiza una lista de usuarios solo con el campo active. :four: añadir los tests de servicio y endpoint.
 
-#### 6. Sprint 3. Preparación de cuatro búsquedas a partir de las siguientes, según el valor de las primeros cuatro valores distintos del último commit realizado de la liberación anterior, se creará una historia (**
-Issues**) por cada búsqueda, con el test correspondiente (**3.5 ptos**).
-
-* `0` Stream&lt;String> findUserFamilyNameInitialBySomeProperFraction();
-* `1` Stream&lt;String> findUserIdBySomeProperFraction();
-* `2` Fraction findFractionMultiplicationByUserFamilyName(String familyName);
-* `3` Fraction findFractionDivisionByUserId(String id);
-* `4` Double findFirstDecimalFractionByUserName(String name);
-* `5` Stream&lt;String> findUserIdByAllProperFraction();
-* `6` Stream&lt;Double> findDecimalImproperFractionByUserName(String name);
-* `7` Fraction findFirstProperFractionByUserId(String id);
-* `8` Stream&lt;String> findUserFamilyNameBySomeImproperFraction();
-* `9` Fraction findHighestFraction();
-* `a` Stream&lt;String> findUserNameBySomeImproperFraction();
-* `b` Stream&lt;String> findUserFamilyNameByAllNegativeSignFractionDistinct();
-* `c` Stream&lt;Double> findDecimalFractionByUserName(String name);
-* `d` Stream&lt;Double> findDecimalFractionByNegativeSignFraction();
-* `e` Fraction findFractionAdditionByUserId(String id);
-* `f` Fraction findFractionSubtractionByUserName(String name);
-
-> Realizar la tercera liberación del código (_**v.4.2.0-release**_)
+> Realizar la tercera liberación del código en **staging** y **main**.
 
 #### 7. Bug (**1.5 ptos**)
-> Suponer que la búsqueda 3 anterior no es buena y se debe proceder a modificarla. Realizar un cambio y proceder a la cuarta liberación del código (_**v.4.2.1-release**_).
+> Suponer que la Feature 2ª anterior existe un error. Error encontrado es que si el user contiene el roll de ADMIN, no se puede desactivar, aspecto que no se tenía en cuenta. Realizar un cambio y proceder a la cuarta liberación del código **staging** y **main**.
 
 ### :white_check_mark: Criterios transversales **con pérdida de puntos por falta de calidad**
-* Uso correcto del flujo de trabajo ramificado. **Hasta -3 ptos**. 
+* Uso correcto del flujo de trabajo ramificado. **Hasta -3 ptos**.
 * Adecuación de la temporalidad de desarrollo según el enunciado. **Hasta -3 ptos**.
-* Mantenimiento de calidad del código según GitHub Actions, Sonar, Better Code Hub. Cobertura >= 80%. **Hasta -2 ptos**.
+* Mantenimiento de calidad del código según GitHub Actions, Sonar. Cobertura >= 80%. **Hasta -3 ptos**.
 * Gestión adecuada, completa y equlibrada (estimación, tiempo real...) durante el desarrollo. **Hasta -2 ptos**.
-* Commits correctos y completos. **Hasta -2 ptos**. 
-* Código limpio, bien formateado y ordenado. **Hasta -2 ptos**. 
+* Commits correctos y completos. **Hasta -2 ptos**.
+* Código limpio, bien formateado y ordenado. **Hasta -2 ptos**.
 * Uso del ingles. **Hasta -1 pto**.
 
 
@@ -133,3 +125,5 @@ Indicar como texto en la subida la **URL de GitHub**
 
 Ejemplo resuelto:
 ![](./docs/miw-iwvg-devops-demo.png)
+
+
