@@ -1,5 +1,6 @@
 package es.upm.miw.devops.rest.exceptionshandler;
 
+import es.upm.miw.devops.domain.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,6 +23,13 @@ public class ApiExceptionHandler {
         return new ErrorMessage(new RuntimeException(
                 "Ruta no encontrada. Prueba con: **/actuator/info o **/swagger-ui.html o **/v3/api-docs o **/v3/api-docs.yaml"),
                 HttpStatus.NOT_FOUND.value());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseBody
+    public ErrorMessage notFound(NotFoundException exception) {
+        return new ErrorMessage(exception, HttpStatus.NOT_FOUND.value());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
