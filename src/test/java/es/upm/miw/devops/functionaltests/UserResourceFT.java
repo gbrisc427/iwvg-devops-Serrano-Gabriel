@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,6 +25,8 @@ class UserResourceFT {
 
     @Autowired
     private UserRepository userRepository;
+
+    // ── Feature 1: GET /user/{id} ──────────────────────────────────────────────
 
     @Test
     void testFindByIdOk() {
@@ -80,5 +84,79 @@ class UserResourceFT {
                 .uri(UserResource.USERS + "/" + nonExistentId)
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // ── Feature 2: GET /user (search with filters) ────────────────────────────
+
+    @Test
+    void testFindAllReturnsAllSeededUsers() {
+        // When / Then: 5 users seeded
+        webTestClient.get()
+                .uri(UserResource.USERS)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserDto.class)
+                .value((List<UserDto> list) -> assertThat(list).hasSize(5));
+    }
+
+    @Test
+    void testFindByActiveTrueReturnsOnlyActiveUsers() {
+        // When / Then: 4 active users seeded
+        webTestClient.get()
+                .uri(UserResource.USERS + "?active=true")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserDto.class)
+                .value((List<UserDto> list) -> {
+                    assertThat(list).hasSize(4);
+                    assertThat(list).allMatch(UserDto::isActive);
+                });
+    }
+
+    @Test
+    void testFindByActiveFalseReturnsOnlyInactiveUsers() {
+        // When / Then: 1 inactive user seeded (Ana Martínez)
+        webTestClient.get()
+                .uri(UserResource.USERS + "?active=false")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserDto.class)
+                .value((List<UserDto> list) -> {
+                    assertThat(list).hasSize(1);
+                    assertThat(list).noneMatch(UserDto::isActive);
+                    assertThat(list.get(0).getFirstName()).isEqualTo("Ana");
+                });
+    }
+
+    @Test
+    void testFindBillableReturnsBillableUsers() {
+        // When / Then: 4 billable users (Ana has null address fields)
+        webTestClient.get()
+                .uri(UserResource.USERS + "?billable=true")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserDto.class)
+                .value((List<UserDto> list) -> {
+                    assertThat(list).hasSize(4);
+                    assertThat(list).allMatch(dto ->
+                            dto.getFirstName() != null && !dto.getFirstName().isBlank() &&
+                            dto.getFamilyName() != null && !dto.getFamilyName().isBlank() &&
+                            dto.getEmail() != null && !dto.getEmail().isBlank() &&
+                            dto.getAddress() != null && !dto.getAddress().isBlank()
+                    );
+                });
+    }
+
+    @Test
+    void testFindBillableExcludesIncompleteUsers() {
+        // When / Then: Ana Martínez must NOT be in the billable list
+        webTestClient.get()
+                .uri(UserResource.USERS + "?billable=true")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserDto.class)
+                .value((List<UserDto> list) ->
+                        assertThat(list).noneMatch(dto -> "Ana".equals(dto.getFirstName()))
+                );
     }
 }

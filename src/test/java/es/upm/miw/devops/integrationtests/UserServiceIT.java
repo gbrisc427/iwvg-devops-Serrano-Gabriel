@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -22,6 +24,8 @@ class UserServiceIT {
 
     @Autowired
     private UserRepository userRepository;
+
+    // ── Feature 1: GET /user/{id} ──────────────────────────────────────────────
 
     @Test
     void testFindByIdOk() {
@@ -68,5 +72,65 @@ class UserServiceIT {
                 () -> userService.findById(nonExistentId));
 
         assertThat(exception.getMessage()).contains(nonExistentId);
+    }
+
+    // ── Feature 2: GET /user (search with filters) ────────────────────────────
+
+    @Test
+    void testFindAllReturnsAllSeededUsers() {
+        // When
+        List<User> result = userService.findAll();
+
+        // Then: seeder loads 5 users
+        assertThat(result).isNotNull().hasSize(5);
+    }
+
+    @Test
+    void testFindByActiveTrue() {
+        // When
+        List<User> result = userService.findByActive(true);
+
+        // Then: seeder has 4 active users (John, Jane, Carlos, Luis)
+        assertThat(result).isNotNull().hasSize(4);
+        assertThat(result).allMatch(User::isActive);
+    }
+
+    @Test
+    void testFindByActiveFalse() {
+        // When
+        List<User> result = userService.findByActive(false);
+
+        // Then: seeder has 1 inactive user (Ana Martínez)
+        assertThat(result).isNotNull().hasSize(1);
+        assertThat(result).noneMatch(User::isActive);
+        assertThat(result.get(0).getFirstName()).isEqualTo("Ana");
+    }
+
+    @Test
+    void testFindBillableReturnsOnlyCompleteUsers() {
+        // When
+        List<User> result = userService.findBillable();
+
+        // Then: seeder has 4 billable users (Ana Martínez has null address fields)
+        assertThat(result).isNotNull().hasSize(4);
+        assertThat(result).allMatch(u ->
+                u.getFirstName() != null && !u.getFirstName().isBlank() &&
+                u.getFamilyName() != null && !u.getFamilyName().isBlank() &&
+                u.getEmail() != null && !u.getEmail().isBlank() &&
+                u.getIdentity() != null && !u.getIdentity().isBlank() &&
+                u.getAddress() != null && !u.getAddress().isBlank() &&
+                u.getCity() != null && !u.getCity().isBlank() &&
+                u.getProvince() != null && !u.getProvince().isBlank() &&
+                u.getPostalCode() != null && !u.getPostalCode().isBlank()
+        );
+    }
+
+    @Test
+    void testFindBillableExcludesIncompleteUsers() {
+        // When
+        List<User> result = userService.findBillable();
+
+        // Then: Ana Martínez (incomplete address fields) must NOT appear
+        assertThat(result).noneMatch(u -> "Ana".equals(u.getFirstName()));
     }
 }
