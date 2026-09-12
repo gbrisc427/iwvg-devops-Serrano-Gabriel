@@ -89,7 +89,17 @@ public class UserResource {
         );
         return new UserDto(this.userService.update(id, user));
     }
+
+    @Operation(summary = "Bulk update user active status", description = "Updates the active field for a list of users")
+    @ApiResponse(responseCode = "204", description = "Users updated")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateActiveList(@RequestBody List<es.upm.miw.devops.rest.dtos.UserActiveDto> userActiveDtoList) {
+        userActiveDtoList.forEach(dto -> this.userService.updateActive(dto.getId(), dto.getActive()));
+    }
 }
+
 
 
 
