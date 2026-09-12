@@ -43,7 +43,23 @@ public class UserService {
         user.setActive(active);
         return this.userRepository.save(user);
     }
+
+    public User update(String id, User user) {
+        User existingUser = this.findById(id);
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setFamilyName(user.getFamilyName());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setIdentity(user.getIdentity());
+        existingUser.setAddress(user.getAddress());
+        existingUser.setCity(user.getCity());
+        existingUser.setProvince(user.getProvince());
+        existingUser.setPostalCode(user.getPostalCode());
+        existingUser.setActive(user.isActive());
+        existingUser.setRole(user.getRole());
+        return this.userRepository.save(existingUser);
+    }
 }
+
 
 
 
