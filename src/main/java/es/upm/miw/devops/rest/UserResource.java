@@ -56,5 +56,15 @@ public class UserResource {
     public UserDto findById(@PathVariable String id) {
         return new UserDto(this.userService.findById(id));
     }
+
+    @Operation(summary = "Delete user by id", description = "Deletes the user with the given id")
+    @ApiResponse(responseCode = "204", description = "User deleted")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @DeleteMapping(ID)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable String id) {
+        this.userService.deleteById(id);
+    }
 }
+
 

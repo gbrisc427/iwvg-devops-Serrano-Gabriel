@@ -133,4 +133,35 @@ class UserServiceIT {
         // Then: Ana Martínez (incomplete address fields) must NOT appear
         assertThat(result).noneMatch(u -> "Ana".equals(u.getFirstName()));
     }
+
+    // ── Feature 3: DELETE /user/{id} ──────────────────────────────────────────
+
+    @Test
+    void testDeleteByIdOk() {
+        // Given: create a temporary user (not part of seeder) to delete
+        User tempUser = userRepository.save(new User("Temp", "User", "temp@test.com",
+                "99999999T", "Calle Test 1", "Madrid", "Madrid", "28000", true, Role.CUSTOMER));
+        String tempId = tempUser.getId();
+        assertThat(userRepository.findById(tempId)).isPresent();
+
+        // When
+        userService.deleteById(tempId);
+
+        // Then: user no longer exists → findById throws NotFoundException
+        assertThrows(NotFoundException.class, () -> userService.findById(tempId));
+        assertThat(userRepository.findById(tempId)).isEmpty();
+    }
+
+    @Test
+    void testDeleteByIdNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        // When / Then
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.deleteById(nonExistentId));
+
+        assertThat(exception.getMessage()).contains(nonExistentId);
+    }
 }
+
