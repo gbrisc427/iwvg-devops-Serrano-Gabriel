@@ -199,5 +199,68 @@ class UserResourceFT {
                 .expectStatus().isNotFound();
     }
 
-}
+    // ── Feature 4: PUT /user/{id}/active ──────────────────────────────────────
 
+    @Test
+    void testUpdateActiveToFalseOk() {
+        // Given: create a temporary active user
+        String tempId = userRepository.save(
+                new User("Active", "Temp", "active.temp@test.com",
+                        "33333333C", "Calle Activa 3", "Madrid", "Madrid", "28002",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        // When: PUT active = false
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId + "/active")
+                .bodyValue(false)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.isActive()).isFalse();
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateActiveToTrueOk() {
+        // Given: create a temporary inactive user
+        String tempId = userRepository.save(
+                new User("Inactive", "Temp", "inactive.temp@test.com",
+                        "44444444D", "Calle Inactiva 4", "Valencia", "Valencia", "46002",
+                        false, Role.CUSTOMER)
+        ).getId();
+
+        // When: PUT active = true
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId + "/active")
+                .bodyValue(true)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.isActive()).isTrue();
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateActiveNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-111111111111";
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + nonExistentId + "/active")
+                .bodyValue(false)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+}
