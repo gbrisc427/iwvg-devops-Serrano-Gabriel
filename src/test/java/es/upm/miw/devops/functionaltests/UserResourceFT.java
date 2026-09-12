@@ -1,5 +1,7 @@
 package es.upm.miw.devops.functionaltests;
 
+import es.upm.miw.devops.domain.model.Role;
+import es.upm.miw.devops.domain.model.User;
 import es.upm.miw.devops.persistence.UserRepository;
 import es.upm.miw.devops.rest.UserResource;
 import es.upm.miw.devops.rest.dtos.UserDto;
@@ -159,4 +161,42 @@ class UserResourceFT {
                         assertThat(list).noneMatch(dto -> "Ana".equals(dto.getFirstName()))
                 );
     }
+
+    // ── Feature 3: DELETE /user/{id} ──────────────────────────────────────────
+
+    @Test
+    void testDeleteByIdOk() {
+        // Given: save a temporary user to delete (keeps seeded data intact)
+        String tempId = userRepository.save(
+                new User("Temp", "Delete", "temp.delete@test.com",
+                        "88888888T", "Calle Borrar 1", "Madrid", "Madrid", "28000",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+
+        // When: DELETE the user
+        webTestClient.delete()
+                .uri(UserResource.USERS + "/" + tempId)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then: a follow-up GET confirms the user is gone
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testDeleteByIdNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        // When / Then
+        webTestClient.delete()
+                .uri(UserResource.USERS + "/" + nonExistentId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
+

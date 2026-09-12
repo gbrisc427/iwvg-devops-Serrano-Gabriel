@@ -32,5 +32,11 @@ public class UserService {
     public List<User> findBillable() {
         return this.userRepository.findBillableUsers();
     }
+
+    public void deleteById(String id) {
+        this.findById(id); // throws NotFoundException if not found
+        this.userRepository.deleteById(id);
+    }
 }
+
 
