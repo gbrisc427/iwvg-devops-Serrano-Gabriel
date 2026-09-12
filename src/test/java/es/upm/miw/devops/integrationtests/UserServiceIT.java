@@ -213,5 +213,60 @@ class UserServiceIT {
 
         assertThat(exception.getMessage()).contains(nonExistentId);
     }
+
+    // ── Feature 5: PUT /user/{id} ─────────────────────────────────────────────
+
+    @Test
+    void testUpdateOk() {
+        // Given: create a temporary user
+        User tempUser = userRepository.save(new User("OldName", "OldFamily", "old@test.com",
+                "12345678Z", "Old Address", "Old City", "Old Province", "11111", true, Role.CUSTOMER));
+
+        User updatedData = new User();
+        updatedData.setFirstName("NewName");
+        updatedData.setFamilyName("NewFamily");
+        updatedData.setEmail("new@test.com");
+        updatedData.setIdentity("87654321A");
+        updatedData.setAddress("New Address");
+        updatedData.setCity("New City");
+        updatedData.setProvince("New Province");
+        updatedData.setPostalCode("22222");
+        updatedData.setActive(false);
+        updatedData.setRole(Role.ADMIN);
+
+        // When
+        User result = userService.update(tempUser.getId(), updatedData);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(tempUser.getId());
+        assertThat(result.getFirstName()).isEqualTo("NewName");
+        assertThat(result.getFamilyName()).isEqualTo("NewFamily");
+        assertThat(result.getEmail()).isEqualTo("new@test.com");
+        assertThat(result.getIdentity()).isEqualTo("87654321A");
+        assertThat(result.getAddress()).isEqualTo("New Address");
+        assertThat(result.getCity()).isEqualTo("New City");
+        assertThat(result.getProvince()).isEqualTo("New Province");
+        assertThat(result.getPostalCode()).isEqualTo("22222");
+        assertThat(result.isActive()).isFalse();
+        assertThat(result.getRole()).isEqualTo(Role.ADMIN);
+
+        // Cleanup
+        userRepository.deleteById(tempUser.getId());
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-222222222222";
+        User updatedData = new User();
+        updatedData.setFirstName("AnyName");
+
+        // When / Then
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.update(nonExistentId, updatedData));
+
+        assertThat(exception.getMessage()).contains(nonExistentId);
+    }
 }
 
