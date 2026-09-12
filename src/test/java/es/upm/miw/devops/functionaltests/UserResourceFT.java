@@ -198,5 +198,6 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
 }
 

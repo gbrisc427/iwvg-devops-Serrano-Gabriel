@@ -163,5 +163,6 @@ class UserServiceIT {
 
         assertThat(exception.getMessage()).contains(nonExistentId);
     }
+
 }
 
