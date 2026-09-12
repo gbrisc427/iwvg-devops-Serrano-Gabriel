@@ -14,7 +14,7 @@
 
     <groupId>es.upm.miw</groupId>
     <artifactId>iwvg-devops-Serrano-Gabriel</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.1.29-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${project.groupId}.${project.artifactId}</name>
     <url>http://github.com/gbrisc27/${project.artifactId}</url>

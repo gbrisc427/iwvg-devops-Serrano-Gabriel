@@ -1,5 +1,7 @@
 package es.upm.miw.devops.functionaltests;
 
+import es.upm.miw.devops.domain.model.Role;
+import es.upm.miw.devops.domain.model.User;
 import es.upm.miw.devops.persistence.UserRepository;
 import es.upm.miw.devops.rest.UserResource;
 import es.upm.miw.devops.rest.dtos.UserDto;
@@ -158,5 +160,107 @@ class UserResourceFT {
                 .value((List<UserDto> list) ->
                         assertThat(list).noneMatch(dto -> "Ana".equals(dto.getFirstName()))
                 );
+    }
+
+    // ── Feature 3: DELETE /user/{id} ──────────────────────────────────────────
+
+    @Test
+    void testDeleteByIdOk() {
+        // Given: save a temporary user to delete (keeps seeded data intact)
+        String tempId = userRepository.save(
+                new User("Temp", "Delete", "temp.delete@test.com",
+                        "88888888T", "Calle Borrar 1", "Madrid", "Madrid", "28000",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+
+        // When: DELETE the user
+        webTestClient.delete()
+                .uri(UserResource.USERS + "/" + tempId)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then: a follow-up GET confirms the user is gone
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void testDeleteByIdNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        // When / Then
+        webTestClient.delete()
+                .uri(UserResource.USERS + "/" + nonExistentId)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    // ── Feature 4: PUT /user/{id}/active ──────────────────────────────────────
+
+    @Test
+    void testUpdateActiveToFalseOk() {
+        // Given: create a temporary active user
+        String tempId = userRepository.save(
+                new User("Active", "Temp", "active.temp@test.com",
+                        "33333333C", "Calle Activa 3", "Madrid", "Madrid", "28002",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        // When: PUT active = false
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId + "/active")
+                .bodyValue(false)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.isActive()).isFalse();
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateActiveToTrueOk() {
+        // Given: create a temporary inactive user
+        String tempId = userRepository.save(
+                new User("Inactive", "Temp", "inactive.temp@test.com",
+                        "44444444D", "Calle Inactiva 4", "Valencia", "Valencia", "46002",
+                        false, Role.CUSTOMER)
+        ).getId();
+
+        // When: PUT active = true
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId + "/active")
+                .bodyValue(true)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.isActive()).isTrue();
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateActiveNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-111111111111";
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + nonExistentId + "/active")
+                .bodyValue(false)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }

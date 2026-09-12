@@ -133,4 +133,85 @@ class UserServiceIT {
         // Then: Ana Martínez (incomplete address fields) must NOT appear
         assertThat(result).noneMatch(u -> "Ana".equals(u.getFirstName()));
     }
+
+    // ── Feature 3: DELETE /user/{id} ──────────────────────────────────────────
+
+    @Test
+    void testDeleteByIdOk() {
+        // Given: create a temporary user (not part of seeder) to delete
+        User tempUser = userRepository.save(new User("Temp", "User", "temp@test.com",
+                "99999999T", "Calle Test 1", "Madrid", "Madrid", "28000", true, Role.CUSTOMER));
+        String tempId = tempUser.getId();
+        assertThat(userRepository.findById(tempId)).isPresent();
+
+        // When
+        userService.deleteById(tempId);
+
+        // Then: user no longer exists → findById throws NotFoundException
+        assertThrows(NotFoundException.class, () -> userService.findById(tempId));
+        assertThat(userRepository.findById(tempId)).isEmpty();
+    }
+
+    @Test
+    void testDeleteByIdNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-000000000000";
+
+        // When / Then
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.deleteById(nonExistentId));
+
+        assertThat(exception.getMessage()).contains(nonExistentId);
+    }
+
+    // ── Feature 4: PUT /user/{id}/active ──────────────────────────────────────
+
+    @Test
+    void testUpdateActiveToFalseOk() {
+        // Given: create a temporary active user
+        User tempUser = userRepository.save(new User("Active", "User", "active@test.com",
+                "11111111A", "Calle Activa 1", "Madrid", "Madrid", "28001", true, Role.CUSTOMER));
+
+        // When: set active to false
+        User result = userService.updateActive(tempUser.getId(), false);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(tempUser.getId());
+        assertThat(result.isActive()).isFalse();
+
+        // Cleanup
+        userRepository.deleteById(tempUser.getId());
+    }
+
+    @Test
+    void testUpdateActiveToTrueOk() {
+        // Given: create a temporary inactive user
+        User tempUser = userRepository.save(new User("Inactive", "User", "inactive@test.com",
+                "22222222B", "Calle Inactiva 2", "Sevilla", "Sevilla", "41001", false, Role.CUSTOMER));
+
+        // When: set active to true
+        User result = userService.updateActive(tempUser.getId(), true);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(tempUser.getId());
+        assertThat(result.isActive()).isTrue();
+
+        // Cleanup
+        userRepository.deleteById(tempUser.getId());
+    }
+
+    @Test
+    void testUpdateActiveNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-111111111111";
+
+        // When / Then
+        NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> userService.updateActive(nonExistentId, false));
+
+        assertThat(exception.getMessage()).contains(nonExistentId);
+    }
 }
+
