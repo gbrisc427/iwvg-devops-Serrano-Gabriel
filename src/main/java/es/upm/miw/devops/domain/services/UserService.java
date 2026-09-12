@@ -37,6 +37,13 @@ public class UserService {
         this.findById(id); // throws NotFoundException if not found
         this.userRepository.deleteById(id);
     }
+
+    public User updateActive(String id, boolean active) {
+        User user = this.findById(id); // throws NotFoundException if not found
+        user.setActive(active);
+        return this.userRepository.save(user);
+    }
 }
+
 
 

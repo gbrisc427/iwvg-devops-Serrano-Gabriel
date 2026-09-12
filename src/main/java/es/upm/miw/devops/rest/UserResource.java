@@ -17,6 +17,7 @@ public class UserResource {
 
     public static final String USERS = "/user";
     public static final String ID = "/{id}";
+    public static final String ID_ACTIVE = "/{id}/active";
 
     private final UserService userService;
 
@@ -65,6 +66,16 @@ public class UserResource {
     public void deleteById(@PathVariable String id) {
         this.userService.deleteById(id);
     }
+
+    @Operation(summary = "Update user active status", description = "Sets the active field of the user to the given value")
+    @ApiResponse(responseCode = "200", description = "User updated")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @PutMapping(ID_ACTIVE)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto updateActive(@PathVariable String id, @RequestBody boolean active) {
+        return new UserDto(this.userService.updateActive(id, active));
+    }
 }
+
 
 
