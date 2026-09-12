@@ -263,4 +263,68 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    // ── Feature 5: PUT /user/{id} ─────────────────────────────────────────────
+
+    @Test
+    void testUpdateOk() {
+        // Given: create a temporary user
+        String tempId = userRepository.save(
+                new User("OldFirst", "OldFamily", "old@email.com",
+                        "77777777F", "Old Address", "Old City", "Old Province", "00000",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        UserDto updateDto = new UserDto();
+        updateDto.setFirstName("NewFirst");
+        updateDto.setFamilyName("NewFamily");
+        updateDto.setEmail("new@email.com");
+        updateDto.setIdentity("99999999G");
+        updateDto.setAddress("New Address");
+        updateDto.setCity("New City");
+        updateDto.setProvince("New Province");
+        updateDto.setPostalCode("11111");
+        updateDto.setActive(false);
+        updateDto.setRole(Role.ADMIN);
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId)
+                .bodyValue(updateDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.getFirstName()).isEqualTo("NewFirst");
+                    assertThat(dto.getFamilyName()).isEqualTo("NewFamily");
+                    assertThat(dto.getEmail()).isEqualTo("new@email.com");
+                    assertThat(dto.getIdentity()).isEqualTo("99999999G");
+                    assertThat(dto.getAddress()).isEqualTo("New Address");
+                    assertThat(dto.getCity()).isEqualTo("New City");
+                    assertThat(dto.getProvince()).isEqualTo("New Province");
+                    assertThat(dto.getPostalCode()).isEqualTo("11111");
+                    assertThat(dto.isActive()).isFalse();
+                    assertThat(dto.getRole()).isEqualTo(Role.ADMIN);
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-333333333333";
+        UserDto updateDto = new UserDto();
+        updateDto.setFirstName("AnyName");
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + nonExistentId)
+                .bodyValue(updateDto)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
+
