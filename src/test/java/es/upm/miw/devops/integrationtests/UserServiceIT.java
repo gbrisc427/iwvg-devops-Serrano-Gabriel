@@ -231,7 +231,7 @@ class UserServiceIT {
         updatedData.setCity("New City");
         updatedData.setProvince("New Province");
         updatedData.setPostalCode("22222");
-        updatedData.setActive(false);
+        updatedData.setActive(true);
         updatedData.setRole(Role.ADMIN);
 
         // When
@@ -248,7 +248,7 @@ class UserServiceIT {
         assertThat(result.getCity()).isEqualTo("New City");
         assertThat(result.getProvince()).isEqualTo("New Province");
         assertThat(result.getPostalCode()).isEqualTo("22222");
-        assertThat(result.isActive()).isFalse();
+        assertThat(result.isActive()).isTrue();
         assertThat(result.getRole()).isEqualTo(Role.ADMIN);
 
         // Cleanup
@@ -268,5 +268,48 @@ class UserServiceIT {
 
         assertThat(exception.getMessage()).contains(nonExistentId);
     }
+
+    // ── Bug Fix: ADMIN cannot be deactivated ────────────────────────────────
+
+    @Test
+    void testDeactivateAdminThrowsConflictException() {
+        // Given: an active admin user
+        User tempAdmin = userRepository.save(new User("Admin", "User", "admin@test.com",
+                "00000000A", "Addr", "City", "Prov", "00000", true, Role.ADMIN));
+
+        // When / Then: trying to deactivate throws ConflictException
+        es.upm.miw.devops.domain.exceptions.ConflictException exception = assertThrows(
+                es.upm.miw.devops.domain.exceptions.ConflictException.class,
+                () -> userService.updateActive(tempAdmin.getId(), false)
+        );
+
+        assertThat(exception.getMessage()).contains("Admin users cannot be deactivated");
+
+        // Cleanup
+        userRepository.deleteById(tempAdmin.getId());
+    }
+
+    @Test
+    void testUpdateAdminToInactiveThrowsConflictException() {
+        // Given: an active admin user
+        User tempAdmin = userRepository.save(new User("Admin", "User", "admin@test.com",
+                "00000000A", "Addr", "City", "Prov", "00000", true, Role.ADMIN));
+
+        User updatedData = new User();
+        updatedData.setRole(Role.ADMIN);
+        updatedData.setActive(false);
+
+        // When / Then
+        es.upm.miw.devops.domain.exceptions.ConflictException exception = assertThrows(
+                es.upm.miw.devops.domain.exceptions.ConflictException.class,
+                () -> userService.update(tempAdmin.getId(), updatedData)
+        );
+
+        assertThat(exception.getMessage()).contains("Admin users cannot be deactivated");
+
+        // Cleanup
+        userRepository.deleteById(tempAdmin.getId());
+    }
 }
+
 

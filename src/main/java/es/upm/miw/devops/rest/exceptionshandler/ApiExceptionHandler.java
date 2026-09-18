@@ -32,6 +32,13 @@ public class ApiExceptionHandler {
         return new ErrorMessage(exception, HttpStatus.NOT_FOUND.value());
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(es.upm.miw.devops.domain.exceptions.ConflictException.class)
+    @ResponseBody
+    public ErrorMessage conflict(es.upm.miw.devops.domain.exceptions.ConflictException exception) {
+        return new ErrorMessage(exception, HttpStatus.CONFLICT.value());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({
             Exception.class

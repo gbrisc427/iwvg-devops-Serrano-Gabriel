@@ -40,12 +40,18 @@ public class UserService {
 
     public User updateActive(String id, boolean active) {
         User user = this.findById(id); // throws NotFoundException if not found
+        if (!active && es.upm.miw.devops.domain.model.Role.ADMIN.equals(user.getRole())) {
+            throw new es.upm.miw.devops.domain.exceptions.ConflictException("Admin users cannot be deactivated");
+        }
         user.setActive(active);
         return this.userRepository.save(user);
     }
 
     public User update(String id, User user) {
         User existingUser = this.findById(id);
+        if (!user.isActive() && es.upm.miw.devops.domain.model.Role.ADMIN.equals(user.getRole())) {
+            throw new es.upm.miw.devops.domain.exceptions.ConflictException("Admin users cannot be deactivated");
+        }
         existingUser.setFirstName(user.getFirstName());
         existingUser.setFamilyName(user.getFamilyName());
         existingUser.setEmail(user.getEmail());
@@ -58,6 +64,7 @@ public class UserService {
         existingUser.setRole(user.getRole());
         return this.userRepository.save(existingUser);
     }
+
 }
 
 
