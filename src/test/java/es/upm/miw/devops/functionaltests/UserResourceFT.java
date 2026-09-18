@@ -263,4 +263,134 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    // ── Feature 5: PUT /user/{id} ─────────────────────────────────────────────
+
+    @Test
+    void testUpdateOk() {
+        // Given: create a temporary user
+        String tempId = userRepository.save(
+                new User("OldFirst", "OldFamily", "old@email.com",
+                        "77777777F", "Old Address", "Old City", "Old Province", "00000",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        UserDto updateDto = new UserDto();
+        updateDto.setFirstName("NewFirst");
+        updateDto.setFamilyName("NewFamily");
+        updateDto.setEmail("new@email.com");
+        updateDto.setIdentity("99999999G");
+        updateDto.setAddress("New Address");
+        updateDto.setCity("New City");
+        updateDto.setProvince("New Province");
+        updateDto.setPostalCode("11111");
+        updateDto.setActive(false);
+        updateDto.setRole(Role.ADMIN);
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId)
+                .bodyValue(updateDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> {
+                    assertThat(dto.getId()).isEqualTo(tempId);
+                    assertThat(dto.getFirstName()).isEqualTo("NewFirst");
+                    assertThat(dto.getFamilyName()).isEqualTo("NewFamily");
+                    assertThat(dto.getEmail()).isEqualTo("new@email.com");
+                    assertThat(dto.getIdentity()).isEqualTo("99999999G");
+                    assertThat(dto.getAddress()).isEqualTo("New Address");
+                    assertThat(dto.getCity()).isEqualTo("New City");
+                    assertThat(dto.getProvince()).isEqualTo("New Province");
+                    assertThat(dto.getPostalCode()).isEqualTo("11111");
+                    assertThat(dto.isActive()).isFalse();
+                    assertThat(dto.getRole()).isEqualTo(Role.ADMIN);
+                });
+
+        // Cleanup
+        userRepository.deleteById(tempId);
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        // Given: a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-333333333333";
+        UserDto updateDto = new UserDto();
+        updateDto.setFirstName("AnyName");
+
+        // When / Then
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + nonExistentId)
+                .bodyValue(updateDto)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    // ── Feature 6: PATCH /user ─────────────────────────────────────────────
+
+    @Test
+    void testUpdateActiveListOk() {
+        // Given: create two temporary users
+        String tempId1 = userRepository.save(
+                new User("Temp1", "User1", "temp1@email.com",
+                        "11111111A", "Addr 1", "City 1", "Prov 1", "11111",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        String tempId2 = userRepository.save(
+                new User("Temp2", "User2", "temp2@email.com",
+                        "22222222B", "Addr 2", "City 2", "Prov 2", "22222",
+                        false, Role.CUSTOMER)
+        ).getId();
+
+        List<es.upm.miw.devops.rest.dtos.UserActiveDto> patchList = List.of(
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(tempId1, false),
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(tempId2, true)
+        );
+
+        // When: bulk update
+        webTestClient.patch()
+                .uri(UserResource.USERS)
+                .bodyValue(patchList)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then: verify via GET
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> assertThat(dto.isActive()).isFalse());
+
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> assertThat(dto.isActive()).isTrue());
+
+        // Cleanup
+        userRepository.deleteById(tempId1);
+        userRepository.deleteById(tempId2);
+    }
+
+    @Test
+    void testUpdateActiveListNotFound() {
+        // Given: list with a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-999999999999";
+
+        List<es.upm.miw.devops.rest.dtos.UserActiveDto> patchList = List.of(
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(nonExistentId, true)
+        );
+
+        // When / Then
+        webTestClient.patch()
+                .uri(UserResource.USERS)
+                .bodyValue(patchList)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
+
