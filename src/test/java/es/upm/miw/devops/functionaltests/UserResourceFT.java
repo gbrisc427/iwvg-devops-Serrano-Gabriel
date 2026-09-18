@@ -284,7 +284,7 @@ class UserResourceFT {
         updateDto.setCity("New City");
         updateDto.setProvince("New Province");
         updateDto.setPostalCode("11111");
-        updateDto.setActive(false);
+        updateDto.setActive(true);
         updateDto.setRole(Role.ADMIN);
 
         // When / Then
@@ -304,7 +304,7 @@ class UserResourceFT {
                     assertThat(dto.getCity()).isEqualTo("New City");
                     assertThat(dto.getProvince()).isEqualTo("New Province");
                     assertThat(dto.getPostalCode()).isEqualTo("11111");
-                    assertThat(dto.isActive()).isFalse();
+                    assertThat(dto.isActive()).isTrue();
                     assertThat(dto.getRole()).isEqualTo(Role.ADMIN);
                 });
 
@@ -391,6 +391,48 @@ class UserResourceFT {
                 .bodyValue(patchList)
                 .exchange()
                 .expectStatus().isNotFound();
+    }
+
+    // ── Bug Fix: ADMIN cannot be deactivated ────────────────────────────────
+
+    @Test
+    void testDeactivateAdminConflict() {
+        // Given: create an active admin user
+        String tempId = userRepository.save(
+                new User("Admin", "User", "admin@email.com",
+                        "00000000A", "Addr", "City", "Prov", "00000",
+                        true, Role.ADMIN)
+        ).getId();
+
+        // When / Then: trying to PUT active=false
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId + "/active")
+                .bodyValue(false)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+
+        // When / Then: trying to bulk PATCH active=false
+        List<es.upm.miw.devops.rest.dtos.UserActiveDto> patchList = List.of(
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(tempId, false)
+        );
+        webTestClient.patch()
+                .uri(UserResource.USERS)
+                .bodyValue(patchList)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+
+        // When / Then: trying to full PUT with active=false and role=ADMIN
+        UserDto updateDto = new UserDto();
+        updateDto.setRole(Role.ADMIN);
+        updateDto.setActive(false);
+        webTestClient.put()
+                .uri(UserResource.USERS + "/" + tempId)
+                .bodyValue(updateDto)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+
+        // Cleanup
+        userRepository.deleteById(tempId);
     }
 }
 
