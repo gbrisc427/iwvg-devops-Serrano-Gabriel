@@ -75,7 +75,32 @@ public class UserResource {
     public UserDto updateActive(@PathVariable String id, @RequestBody boolean active) {
         return new UserDto(this.userService.updateActive(id, active));
     }
+
+    @Operation(summary = "Update user", description = "Updates user details")
+    @ApiResponse(responseCode = "200", description = "User updated")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @PutMapping(ID)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto update(@PathVariable String id, @RequestBody UserDto userDto) {
+        es.upm.miw.devops.domain.model.User user = new es.upm.miw.devops.domain.model.User(
+                userDto.getFirstName(), userDto.getFamilyName(), userDto.getEmail(),
+                userDto.getIdentity(), userDto.getAddress(), userDto.getCity(),
+                userDto.getProvince(), userDto.getPostalCode(), userDto.isActive(), userDto.getRole()
+        );
+        return new UserDto(this.userService.update(id, user));
+    }
+
+    @Operation(summary = "Bulk update user active status", description = "Updates the active field for a list of users")
+    @ApiResponse(responseCode = "204", description = "Users updated")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateActiveList(@RequestBody List<es.upm.miw.devops.rest.dtos.UserActiveDto> userActiveDtoList) {
+        userActiveDtoList.forEach(dto -> this.userService.updateActive(dto.getId(), dto.getActive()));
+    }
 }
+
+
 
 
 
