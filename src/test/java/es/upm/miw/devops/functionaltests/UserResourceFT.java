@@ -326,5 +326,71 @@ class UserResourceFT {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    // ── Feature 6: PATCH /user ─────────────────────────────────────────────
+
+    @Test
+    void testUpdateActiveListOk() {
+        // Given: create two temporary users
+        String tempId1 = userRepository.save(
+                new User("Temp1", "User1", "temp1@email.com",
+                        "11111111A", "Addr 1", "City 1", "Prov 1", "11111",
+                        true, Role.CUSTOMER)
+        ).getId();
+
+        String tempId2 = userRepository.save(
+                new User("Temp2", "User2", "temp2@email.com",
+                        "22222222B", "Addr 2", "City 2", "Prov 2", "22222",
+                        false, Role.CUSTOMER)
+        ).getId();
+
+        List<es.upm.miw.devops.rest.dtos.UserActiveDto> patchList = List.of(
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(tempId1, false),
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(tempId2, true)
+        );
+
+        // When: bulk update
+        webTestClient.patch()
+                .uri(UserResource.USERS)
+                .bodyValue(patchList)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        // Then: verify via GET
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId1)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> assertThat(dto.isActive()).isFalse());
+
+        webTestClient.get()
+                .uri(UserResource.USERS + "/" + tempId2)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserDto.class)
+                .value(dto -> assertThat(dto.isActive()).isTrue());
+
+        // Cleanup
+        userRepository.deleteById(tempId1);
+        userRepository.deleteById(tempId2);
+    }
+
+    @Test
+    void testUpdateActiveListNotFound() {
+        // Given: list with a non-existent id
+        String nonExistentId = "00000000-0000-0000-0000-999999999999";
+
+        List<es.upm.miw.devops.rest.dtos.UserActiveDto> patchList = List.of(
+                new es.upm.miw.devops.rest.dtos.UserActiveDto(nonExistentId, true)
+        );
+
+        // When / Then
+        webTestClient.patch()
+                .uri(UserResource.USERS)
+                .bodyValue(patchList)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
 
