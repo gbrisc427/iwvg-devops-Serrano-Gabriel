@@ -27,6 +27,7 @@ jobs:
       - name: 🏷️ Extract GitHub Container Registry, repository (lowercase) & version from pom
         run: |
           echo "GHCR_URL=ghcr.io" >> $GITHUB_ENV
+          echo "ARTIFACT=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)" >> $GITHUB_ENV          
           echo "REPOSITORY=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
           echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
@@ -54,7 +55,7 @@ jobs:
             ghcr.io/${{ env.REPOSITORY }}:latest
 
       - name: 🚀 Deploy on Lightsail (AWS)
-        uses: appleboy/ssh-action@v1.2.1
+        uses: appleboy/ssh-action@8faa84277b88b6cd1455986f459aa66cf72bc8a3 # v1.2.1
         with:
           host: ${{secrets.AWS_LIGHTSAIL_IP_MAIN }}
           username: ${{secrets.AWS_LIGHTSAIL_USER_MAIN }}
