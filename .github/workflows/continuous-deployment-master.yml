@@ -70,12 +70,8 @@ jobs:
             echo "$GHCR_TOKEN" | sudo docker login ghcr.io -u "$ACTOR" --password-stdin      
             sudo docker pull ghcr.io/$REPOSITORY:latest
             sudo docker rm -f $ARTIFACT || true
-            sudo docker network create devops || true
             sudo docker run -d \
               --name $ARTIFACT \
-              --restart always \
-              --memory 512m \
-              --memory-swap 1024m \
               -p 10000:10000 \
               -e SPRING_PROFILES_ACTIVE=prod \
               ghcr.io/$REPOSITORY:latest
