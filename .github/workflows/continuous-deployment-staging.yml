@@ -54,8 +54,10 @@ jobs:
             ghcr.io/${{ env.REPOSITORY }}:staging
 
       - name: 🚀 Deploy on Render
+        env:
+          SECRET: ${{ secrets.RENDER_DEPLOY_HOOK_TOKEN }}
         run: |
-            curl --fail -X POST "${{ secrets.RENDER_DEPLOY_HOOK_TOKEN }}" \
-            && echo "✅ Deployment succeeded" \
-            || (echo "❌ Deployment failed" && exit 1)
+          curl --fail -X POST "$SECRET" \
+          && echo "✅ Deployment succeeded" \
+          || (echo "❌ Deployment failed" && exit 1)
 

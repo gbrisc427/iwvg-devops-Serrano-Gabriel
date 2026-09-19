@@ -2,18 +2,19 @@
 ## Ingeniería Web: Visión General (IWVG) DevOps
 > Este proyecto es un apoyo docente de la asignatura. Cada release liberada corresponde al código utilizado en clase del curso indicado
 
-[![GitHub](https://img.shields.io/github/license/miw-upm/iwvg-devops?color=informational)](https://github.com/miw-upm/iwvg-devops/blob/develop/LICENSE.md)
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/miw-upm/iwvg-devops?color=informational)](https://github.com/miw-upm/iwvg-devops/releases)
-![GitHub Release Date](https://img.shields.io/github/release-date/miw-upm/iwvg-devops?color=informational)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/miw-upm/iwvg-devops)
-![GitHub issues](https://img.shields.io/github/issues/miw-upm/iwvg-devops?color=important)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/miw-upm/iwvg-devops?color=informational)
+[![GitHub](https://img.shields.io/github/license/gbrisc427/iwvg-devops-Serrano-Gabriel?color=informational)](https://github.com/gbrisc427/iwvg-devops-Serrano-Gabriel/blob/master/LICENSE.md)
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/gbrisc427/iwvg-devops-Serrano-Gabriel?color=informational)](https://github.com/gbrisc427/iwvg-devops-Serrano-Gabriel/releases)
+![GitHub Release Date](https://img.shields.io/github/release-date/gbrisc427/iwvg-devops-Serrano-Gabriel?color=informational)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/gbrisc427/iwvg-devops-Serrano-Gabriel)
+![GitHub issues](https://img.shields.io/github/issues/gbrisc427/iwvg-devops-Serrano-Gabriel?color=important)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/gbrisc427/iwvg-devops-Serrano-Gabriel?color=informational)
 
 ### Estado del código
 [![DevOps](https://github.com/gbrisc427/iwvg-devops-Serrano-Gabriel/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/gbrisc427/iwvg-devops-Serrano-Gabriel/actions/workflows/continuous-integration.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=id=gbrisc_iwvg-devops-Serrano-Gabriel&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=gbrisc_iwvg-devops-Serrano-Gabriel)
-[![Render broken](https://iwvg-devops-latest.onrender.com/version-badge)](https://iwvg-devops-latest.onrender.com/swagger-ui.html)
-
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=gbrisc_iwvg-devops-Serrano-Gabriel&metric=alert_status&token=bc432361bfb71260feb2590f09e18b44911b7ce9)](https://sonarcloud.io/summary/new_code?id=gbrisc_iwvg-devops-Serrano-Gabriel)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gbrisc_iwvg-devops-Serrano-Gabriel&metric=coverage&token=bc432361bfb71260feb2590f09e18b44911b7ce9)](https://sonarcloud.io/summary/new_code?id=gbrisc_iwvg-devops-Serrano-Gabriel)
+[![Render broken](https://iwvg-devops-serrano-gabriel.onrender.com/version-badge)](https://iwvg-devops-serrano-gabriel.onrender.com/swagger-ui.html)
+[![AWS Lightsail](https://img.shields.io/website?url=http%3A%2F%2F51.48.157.167:10000%2Fuser&up_message=online&down_message=offline&label=API%20Users)](http://51.48.157.167:10000/user)
 
 ### Tecnologías necesarias
 `Java` `Maven` `GitHub` `GitHub Actions` `Sonarcloud` `Slack` `Spring-Boot` `GitHub Packages` `Docker` `OpenAPI`
