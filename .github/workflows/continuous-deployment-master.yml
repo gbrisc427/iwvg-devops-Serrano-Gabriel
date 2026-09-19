@@ -5,7 +5,7 @@ on:
 
 jobs:
   cd:
-    name: Build & Push GitHub Package & Deploy on Render Docker Image
+    name: Build & Push GitHub Package & Deploy on AWS Docker Image
     runs-on: ubuntu-22.04
     permissions:
       contents: read
