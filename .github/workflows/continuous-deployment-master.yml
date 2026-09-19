@@ -56,41 +56,46 @@ jobs:
 
       - name: 🚀 Deploy on Lightsail (AWS)
         uses: appleboy/ssh-action@8faa84277b88b6cd1455986f459aa66cf72bc8a3 # v1.2.1
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_PERSONAL_ACCESS_TOKEN }}
+          REPOSITORY: ${{ env.REPOSITORY }}
+          ARTIFACT: ${{ env.ARTIFACT }}
+          ACTOR: ${{ github.actor }}
         with:
-          host: ${{secrets.AWS_LIGHTSAIL_IP_MAIN }}
-          username: ${{secrets.AWS_LIGHTSAIL_USER_MAIN }}
-          key: ${{secrets.AWS_LIGHTSAIL_SSH_KEY_MAIN }}
+          host: ${{ secrets.AWS_LIGHTSAIL_IP_MAIN }}
+          username: ${{ secrets.AWS_LIGHTSAIL_USER_MAIN }}
+          key: ${{ secrets.AWS_LIGHTSAIL_SSH_KEY_MAIN }}
+          envs: GHCR_TOKEN, REPOSITORY, ARTIFACT, ACTOR
           script: |
-            echo ${{secrets.GHCR_PERSONAL_ACCESS_TOKEN }} | docker login ghcr.io -u ${{github.actor }} --password-stdin
-            
-            docker pull ghrc.io/${{env.REPOSITORY }}:latest
-            docker rm -f ${{env.ARTIFACT }} || true
-            docker run -d \
-              --name ${{ env.ARTIFACT }} \
+            echo "$GHCR_TOKEN" | sudo docker login ghcr.io -u "$ACTOR" --password-stdin      
+            sudo docker pull ghcr.io/$REPOSITORY:latest
+            sudo docker rm -f $ARTIFACT || true
+            sudo docker run -d \
+              --name $ARTIFACT \
               --restart always \
               --memory 512m \
               --memory-swap 1024m \
               --network devops \
               -p 10000:10000 \
               -e SPRING_PROFILES_ACTIVE=prod \
-              ghcr.io/${{ env.REPOSITORY }}:latest
+              ghcr.io/$REPOSITORY:latest
 
             echo "⏳ Esperando a que se levante"
             for i in $(seq 1 6); do
               sleep 15
-              STATUS=$(docker inspect --format='{{.State.Health.Status}}' ${{ env.ARTIFACT }} 2>/dev/null)
+              STATUS=$(sudo docker inspect --format='{{.State.Health.Status}}' $ARTIFACT 2>/dev/null)
               echo "Intento $i: $STATUS"
               [ "$STATUS" = "healthy" ] && break
             done
 
             if [ "$STATUS" != "healthy" ]; then
               echo "❌ Deploy fallido"
-              docker logs --tail 50 ${{ env.ARTIFACT }}
+              sudo docker logs --tail 50 $ARTIFACT
               exit 1
             fi
 
             echo "✅ Deploy exitoso"
-            docker image prune --filter "until=12h" -f
+            sudo docker image prune --filter "until=12h" -f
             
 
 
